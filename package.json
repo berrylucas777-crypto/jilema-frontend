@@ -1,0 +1,11 @@
+{
+  "name": "jilema-frontend",
+  "version": "1.0.0-demo.20260808",
+  "private": true,
+  "description": "暨了么现阶段确定的默认移动端前端 Demo",
+  "scripts": {
+    "build": "node build.mjs",
+    "validate": "node validate.mjs",
+    "check": "npm run build && npm run validate"
+  }
+}

@@ -18,8 +18,8 @@
   const PAPER = '#F5F4F0';   // 文档纸面（暖象牙）
   const SURFACE = '#FFFFFF'; // 产品主表面（纯白）
   const INK = '#1B1B18';     // 主文字、主数据（深炭黑）
-  const MUTED = '#75746D';   // 次级文字、副标题
-  const FAINT = '#B4B3AB';   // 来源行、辅助信息
+  const MUTED = '#62615B';   // 次级文字、副标题（白底对比度充足）
+  const FAINT = '#75746D';   // 来源行、辅助信息（小字仍满足可读性）
   const LINE = '#DDDCD4';    // 发丝线、分隔线
   const CARD = '#FBFAF7';    // 卡片面（比纸面亮半级，靠明度差而非边框分卡）
 
@@ -31,8 +31,8 @@
     bg: '#1B1B18',
     card: '#242420',
     ink: '#F5F4F0',
-    muted: '#9B9A92',
-    faint: '#5E5D57',
+    muted: '#BCBBB2',
+    faint: '#9B9A92',
     line: '#33322D',
     ladder: ['#F5F4F0', '#D8D7CF', '#BCBBB2', '#9B9A92', '#75746D', '#5B5A54', '#3D3C37'],
   };
@@ -55,6 +55,19 @@
     danger:  '#F6E3E0',
   };
 
+  /* 业务场景色：表达内容类别，与 success / warning / danger 状态色分离。 */
+  const SCENE = {
+    question: { light: SEMANTIC.warning.light, dark: SEMANTIC.warning.dark, tint: TINT.warning },
+    review: { light: SEMANTIC.accent.light, dark: SEMANTIC.accent.dark, tint: TINT.accent },
+    resource: { light: SEMANTIC.success.light, dark: SEMANTIC.success.dark, tint: TINT.success },
+    campus: { light: '#B35431', dark: '#F09A7B', tint: '#F7E7DF' },
+    matchBuddy: { light: SEMANTIC.info.light, dark: SEMANTIC.info.dark, tint: TINT.info },
+    matchRelationship: { light: '#A83F63', dark: '#EC8EAE', tint: '#F6E3EA' },
+    matchPlaza: { light: SEMANTIC.accent.light, dark: SEMANTIC.accent.dark, tint: TINT.accent },
+    trust: { light: SEMANTIC.success.light, dark: SEMANTIC.success.dark, tint: TINT.success },
+    wait: { light: SEMANTIC.warning.light, dark: SEMANTIC.warning.dark, tint: TINT.warning },
+  };
+
   /* ── 字体 ─────────────────────────────────────────────────── */
   const FONT = {
     family: "'Inter', -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif",
@@ -62,12 +75,13 @@
     link: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
     /* 字号刻度（build 密度基准；learn 密度由 DENSITY 系数放大） */
     display: { size: 20,   weight: 700, spacing: '-.02em' },  // 区块级标题
-    title:   { size: 15,   weight: 700, spacing: '-.01em' },  // 组件标题（结论卡的结论句也用它）
-    body:    { size: 13.5, weight: 400, lineHeight: 1.65 },   // 正文
-    sub:     { size: 11.5, weight: 400 },                     // 副标题、说明
-    caption: { size: 10.5, weight: 500 },                     // tag、徽章、表头
-    src:     { size: 9.5,  weight: 600, spacing: '.08em' },   // 来源行，全大写
-    min:     9,                                               // 任何文字不得低于此值
+    title:   { size: 15.5, weight: 700, spacing: '-.01em' },  // 组件标题（结论卡的结论句也用它）
+    body:    { size: 14.5, weight: 400, lineHeight: 1.55 },   // 正文
+    sub:     { size: 12.5, weight: 400 },                     // 副标题、说明
+    caption: { size: 12,   weight: 500 },                     // tag、徽章、表头
+    src:     { size: 11.5, weight: 600, spacing: '.04em' },   // 来源行，全大写
+    input:   { size: 16,   weight: 400 },                     // 表单输入，避免 iOS 聚焦缩放
+    min:     11.5,                                             // 移动产品文字下限
   };
 
   /* ── 间距 / 形状 / 深度 ───────────────────────────────────── */
@@ -77,6 +91,10 @@
     innerRadius: 8,     // 卡内嵌套元素（代码块、tint 区块）
     pillRadius: 99,     // tag、徽章、按钮
     borderWidth: 1,     // 需要边框时只用发丝线
+  };
+  const HIT = {
+    min: 44,
+    gap: 8,
   };
   const ELEVATION = {
     /* 全系统默认扁平；唯一允许的阴影给浮层（预览卡、tooltip） */
@@ -95,7 +113,6 @@
       @keyframes op-enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
       @media (prefers-reduced-motion:reduce){
         .op-enter{animation:none}
-        *{transition-duration:.01ms!important;animation-duration:.01ms!important}
       }`,
   };
 
@@ -105,6 +122,10 @@
   const DENSITY = {
     learn: { fontScale: 1.12, spaceScale: 1.25, detailDefaultOpen: false },
     build: { fontScale: 1.0,  spaceScale: 1.0,  detailDefaultOpen: true },
+  };
+  const TEXT_SIZE = {
+    large: 1.12,
+    xlarge: 1.24,
   };
 
   /* ── 来源 / 变换类型徽标（可追溯性是视觉元素） ─────────────── */
@@ -157,13 +178,23 @@
       --op-danger:${SEMANTIC.danger.light};
       --op-tint-accent:${TINT.accent};--op-tint-info:${TINT.info};--op-tint-success:${TINT.success};
       --op-tint-warning:${TINT.warning};--op-tint-danger:${TINT.danger};
+      --op-scene-question:${SCENE.question.light};--op-scene-question-tint:${SCENE.question.tint};
+      --op-scene-review:${SCENE.review.light};--op-scene-review-tint:${SCENE.review.tint};
+      --op-scene-resource:${SCENE.resource.light};--op-scene-resource-tint:${SCENE.resource.tint};
+      --op-scene-campus:${SCENE.campus.light};--op-scene-campus-tint:${SCENE.campus.tint};
+      --op-scene-match-buddy:${SCENE.matchBuddy.light};--op-scene-match-buddy-tint:${SCENE.matchBuddy.tint};
+      --op-scene-match-relationship:${SCENE.matchRelationship.light};--op-scene-match-relationship-tint:${SCENE.matchRelationship.tint};
+      --op-scene-match-plaza:${SCENE.matchPlaza.light};--op-scene-match-plaza-tint:${SCENE.matchPlaza.tint};
+      --op-scene-trust:${SCENE.trust.light};--op-scene-trust-tint:${SCENE.trust.tint};
+      --op-scene-wait:${SCENE.wait.light};--op-scene-wait-tint:${SCENE.wait.tint};
       --op-font:${FONT.family};--op-mono:${FONT.mono};
       --op-fs-display:${FONT.display.size}px;--op-fs-title:${FONT.title.size}px;
       --op-fs-body:${FONT.body.size}px;--op-fs-sub:${FONT.sub.size}px;
-      --op-fs-caption:${FONT.caption.size}px;--op-fs-src:${FONT.src.size}px;
+      --op-fs-caption:${FONT.caption.size}px;--op-fs-src:${FONT.src.size}px;--op-fs-input:${FONT.input.size}px;
       --op-sp-1:${SPACE[0]}px;--op-sp-2:${SPACE[1]}px;--op-sp-3:${SPACE[2]}px;--op-sp-4:${SPACE[3]}px;
       --op-sp-5:${SPACE[4]}px;--op-sp-6:${SPACE[5]}px;--op-sp-7:${SPACE[6]}px;--op-sp-8:${SPACE[7]}px;
       --op-r-card:${SHAPE.cardRadius}px;--op-r-inner:${SHAPE.innerRadius}px;--op-r-pill:${SHAPE.pillRadius}px;
+      --op-hit:${HIT.min}px;--op-hit-gap:${HIT.gap}px;
       --op-shadow-pop:${ELEVATION.pop};
       --op-t-fast:${MOTION.fast}ms;--op-t-enter:${MOTION.enter}ms;--op-ease:${MOTION.ease};
       --op-sk-orange:${SKETCH.hue.orange.line};--op-sk-orange-tint:${SKETCH.hue.orange.tint};
@@ -187,16 +218,50 @@
       --op-sk-fs-pre:${SKETCH.fs.pre}px;
     }
     [data-theme="dark"]{
-      --op-paper:${DARK.bg};--op-ink:${DARK.ink};--op-muted:${DARK.muted};
+      --op-paper:${DARK.bg};--op-surface:${DARK.bg};--op-ink:${DARK.ink};--op-muted:${DARK.muted};
       --op-faint:${DARK.faint};--op-line:${DARK.line};--op-card:${DARK.card};
+      --op-l1:${DARK.ladder[0]};--op-l2:${DARK.ladder[1]};--op-l3:${DARK.ladder[2]};--op-l4:${DARK.ladder[3]};
+      --op-l5:${DARK.ladder[4]};--op-l6:${DARK.ladder[5]};--op-l7:${DARK.ladder[6]};
       --op-accent:${SEMANTIC.accent.dark};--op-info:${SEMANTIC.info.dark};
       --op-success:${SEMANTIC.success.dark};--op-warning:${SEMANTIC.warning.dark};
       --op-danger:${SEMANTIC.danger.dark};
+      --op-tint-accent:color-mix(in srgb,var(--op-accent) 18%,var(--op-surface));
+      --op-tint-info:color-mix(in srgb,var(--op-info) 18%,var(--op-surface));
+      --op-tint-success:color-mix(in srgb,var(--op-success) 18%,var(--op-surface));
+      --op-tint-warning:color-mix(in srgb,var(--op-warning) 18%,var(--op-surface));
+      --op-tint-danger:color-mix(in srgb,var(--op-danger) 18%,var(--op-surface));
+      --op-scene-question:${SCENE.question.dark};--op-scene-question-tint:color-mix(in srgb,var(--op-scene-question) 18%,var(--op-surface));
+      --op-scene-review:${SCENE.review.dark};--op-scene-review-tint:color-mix(in srgb,var(--op-scene-review) 18%,var(--op-surface));
+      --op-scene-resource:${SCENE.resource.dark};--op-scene-resource-tint:color-mix(in srgb,var(--op-scene-resource) 18%,var(--op-surface));
+      --op-scene-campus:${SCENE.campus.dark};--op-scene-campus-tint:color-mix(in srgb,var(--op-scene-campus) 18%,var(--op-surface));
+      --op-scene-match-buddy:${SCENE.matchBuddy.dark};--op-scene-match-buddy-tint:color-mix(in srgb,var(--op-scene-match-buddy) 18%,var(--op-surface));
+      --op-scene-match-relationship:${SCENE.matchRelationship.dark};--op-scene-match-relationship-tint:color-mix(in srgb,var(--op-scene-match-relationship) 18%,var(--op-surface));
+      --op-scene-match-plaza:${SCENE.matchPlaza.dark};--op-scene-match-plaza-tint:color-mix(in srgb,var(--op-scene-match-plaza) 18%,var(--op-surface));
+      --op-scene-trust:${SCENE.trust.dark};--op-scene-trust-tint:color-mix(in srgb,var(--op-scene-trust) 18%,var(--op-surface));
+      --op-scene-wait:${SCENE.wait.dark};--op-scene-wait-tint:color-mix(in srgb,var(--op-scene-wait) 18%,var(--op-surface));
     }
     [data-density="learn"]{
       --op-fs-display:${FONT.display.size * DENSITY.learn.fontScale}px;
       --op-fs-title:${FONT.title.size * DENSITY.learn.fontScale}px;
       --op-fs-body:${FONT.body.size * DENSITY.learn.fontScale}px;
+    }
+    [data-text-size="large"]{
+      --op-fs-display:${FONT.display.size * TEXT_SIZE.large}px;
+      --op-fs-title:${FONT.title.size * TEXT_SIZE.large}px;
+      --op-fs-body:${FONT.body.size * TEXT_SIZE.large}px;
+      --op-fs-sub:${FONT.sub.size * TEXT_SIZE.large}px;
+      --op-fs-caption:${FONT.caption.size * TEXT_SIZE.large}px;
+      --op-fs-src:${FONT.src.size * TEXT_SIZE.large}px;
+      --op-fs-input:${FONT.input.size * TEXT_SIZE.large}px;
+    }
+    [data-text-size="xlarge"]{
+      --op-fs-display:${FONT.display.size * TEXT_SIZE.xlarge}px;
+      --op-fs-title:${FONT.title.size * TEXT_SIZE.xlarge}px;
+      --op-fs-body:${FONT.body.size * TEXT_SIZE.xlarge}px;
+      --op-fs-sub:${FONT.sub.size * TEXT_SIZE.xlarge}px;
+      --op-fs-caption:${FONT.caption.size * TEXT_SIZE.xlarge}px;
+      --op-fs-src:${FONT.src.size * TEXT_SIZE.xlarge}px;
+      --op-fs-input:${FONT.input.size * TEXT_SIZE.xlarge}px;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{background:var(--op-paper);color:var(--op-ink);font-family:var(--op-font);
@@ -209,7 +274,7 @@
 
   const OP = {
     PAPER, SURFACE, INK, MUTED, FAINT, LINE, CARD, LADDER, DARK,
-    SEMANTIC, TINT, FONT, SPACE, SHAPE, ELEVATION, MOTION, DENSITY, TRANSFORM,
+    SEMANTIC, TINT, SCENE, FONT, SPACE, SHAPE, HIT, ELEVATION, MOTION, DENSITY, TEXT_SIZE, TRANSFORM,
     SKETCH, BASE_CSS, rnd,
   };
 

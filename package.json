@@ -1,6 +1,6 @@
 {
   "name": "jilema-frontend",
-  "version": "1.0.0-demo.20260808",
+  "version": "1.0.0-demo.20260809",
   "private": true,
   "description": "暨了么现阶段确定的默认移动端前端 Demo",
   "scripts": {

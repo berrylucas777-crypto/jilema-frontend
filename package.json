@@ -5,7 +5,9 @@
   "description": "暨了么现阶段确定的默认移动端前端 Demo",
   "scripts": {
     "build": "node build.mjs",
+    "dev": "node dev-server.mjs",
+    "test:adapter": "node integration/legacy-api-adapter.test.mjs",
     "validate": "node validate.mjs",
-    "check": "npm run build && npm run validate"
+    "check": "npm run test:adapter && npm run build && npm run validate"
   }
 }

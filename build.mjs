@@ -30,6 +30,12 @@ if (!tokensPath) {
 const OP = require(tokensPath);
 
 const template = readFileSync(join(here, 'template.html'), 'utf8');
+const legacyAdapterPath = join(here, 'integration/legacy-api-adapter.js');
+if (!existsSync(legacyAdapterPath)) {
+  console.error('✗ 找不到旧接口兼容层：integration/legacy-api-adapter.js');
+  process.exit(1);
+}
+const legacyAdapter = readFileSync(legacyAdapterPath, 'utf8');
 
 const registry = new Set();
 const collect = (v) => {
@@ -60,8 +66,13 @@ if (violations.length) {
 }
 
 const PLACEHOLDER = '<!--OP_BASE_CSS-->';
+const LEGACY_ADAPTER_PLACEHOLDER = '<!--JILEMA_LEGACY_API_ADAPTER-->';
 if (!template.includes(PLACEHOLDER)) {
   console.error(`✗ 模板缺少占位符 ${PLACEHOLDER}`);
+  process.exit(1);
+}
+if (!template.includes(LEGACY_ADAPTER_PLACEHOLDER)) {
+  console.error(`✗ 模板缺少占位符 ${LEGACY_ADAPTER_PLACEHOLDER}`);
   process.exit(1);
 }
 const out = template.replace(
@@ -69,9 +80,16 @@ const out = template.replace(
   () => `<style data-source="tokens.js · BASE_CSS（构建期内联，禁止手改）">\n${OP.BASE_CSS}\n</style>\n` +
     `<script data-source="tokens.js · TRANSFORM（构建期内联，禁止手改）">\n` +
     `window.OP = { TRANSFORM: ${JSON.stringify(OP.TRANSFORM, null, 2)} };\n</script>`
+).replace(
+  LEGACY_ADAPTER_PLACEHOLDER,
+  () => `<script data-source="integration/legacy-api-adapter.js · 构建期内联">\n${legacyAdapter}\n</script>`
 );
 if (out.includes(PLACEHOLDER)) {
   console.error('✗ 构建异常：替换后仍存在占位符');
+  process.exit(1);
+}
+if (out.includes(LEGACY_ADAPTER_PLACEHOLDER)) {
+  console.error('✗ 构建异常：旧接口兼容层占位符未替换');
   process.exit(1);
 }
 

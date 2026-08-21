@@ -8,7 +8,10 @@
 
 - 在线预览：<https://berrylucas777-crypto.github.io/jilema-frontend/>
 - 默认进入“我的”：<https://berrylucas777-crypto.github.io/jilema-frontend/?mainTab=profile>
+- 校园知识库与 AI 问答 Demo：<https://berrylucas777-crypto.github.io/jilema-frontend/campus-knowledge/>
 - 本地直接打开：`index.html`
+
+`campus-knowledge/` 是独立的演示页面，不替换当前默认前端。它用于展示校园知识目录、可信答案状态以及基于同一知识底座的 AI 问答入口，适合产品介绍、访谈和演示文稿外链。
 
 ## 当前范围
 

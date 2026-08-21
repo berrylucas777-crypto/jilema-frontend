@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>暨了么 · 校园知识库 Demo</title>
+  <style>
+    @font-face{font-family:JilemaDisplay;src:url('./assets/ZCOOLKuaiLe.ttf') format('truetype');font-display:swap}
+    :root{
+      --paper:#f1f1ed;--surface:#fff;--card:#f8f8f5;--ink:#191916;--muted:#66655e;
+      --faint:#8b8a82;--line:#e3e2dc;--accent:#5b4fd0;--accent-soft:#eceafa;
+      --green:#46730f;--green-soft:#edf4df;--orange:#9a6208;--orange-soft:#f8eedc;
+      --red:#a32e22;--red-soft:#f8e8e5;--blue:#0c7281;--blue-soft:#e4f1f3;
+      --shadow:0 22px 70px rgba(27,27,24,.16);--radius:14px;--safe-bottom:env(safe-area-inset-bottom,0px);
+      --ease:cubic-bezier(.2,.75,.25,1);
+    }
+    *{box-sizing:border-box}
+    html{background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+    body{margin:0;min-height:100vh;background:var(--paper)}
+    button,input{font:inherit}
+    button{color:inherit}
+    button,[role="button"]{-webkit-tap-highlight-color:transparent}
+    ::selection{background:#dcd8ff;color:#201b64}
+    :focus-visible{outline:3px solid rgba(91,79,208,.28);outline-offset:2px}
+    *{scrollbar-width:thin;scrollbar-color:#c7c4da transparent}
+    *::-webkit-scrollbar{width:8px;height:8px}
+    *::-webkit-scrollbar-thumb{background:#c7c4da;border-radius:8px}
+    .app{width:min(100%,430px);min-height:100dvh;margin:0 auto;background:var(--surface);position:relative;overflow:hidden}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);padding:10px 14px 9px;backdrop-filter:saturate(160%) blur(14px)}
+    .topline{height:40px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .brand-group{display:flex;align-items:center;gap:5px;min-width:0}
+    .menu-button{width:40px;height:40px;border:0;background:transparent;border-radius:11px;display:grid;place-items:center;cursor:pointer;flex:none}
+    .menu-button:active{background:#f2f2ee}
+    .menu-button svg{width:22px;height:22px}
+    .brand{font-family:JilemaDisplay,"PingFang SC",sans-serif;font-size:21px;font-weight:400;letter-spacing:-.02em;display:flex;align-items:baseline;gap:7px}
+    .brand small{font-size:12px;color:var(--muted);font-weight:650;letter-spacing:0}
+    .campus-button{height:36px;border:0;background:transparent;padding:0 3px 0 8px;display:flex;align-items:center;gap:4px;font-size:13px;font-weight:720;cursor:pointer}
+    .campus-button svg{width:16px;height:16px}
+    .search{height:44px;background:#f4f4f1;border:1px solid #ecebe5;border-radius:12px;display:flex;align-items:center;gap:9px;padding:0 12px;margin-top:7px;transition:border-color .18s,background .18s}
+    .search:focus-within{background:#fff;border-color:#aaa3e9}
+    .search svg{width:18px;color:#77766e;flex:none}
+    .search input{width:100%;border:0;outline:0;background:transparent;font-size:16px;color:var(--ink)}
+    .search input::placeholder{color:#85847d}
+    .demo-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 14px;border-bottom:1px solid var(--line);background:#fafaf7;color:var(--muted);font-size:10.5px}
+    .demo-strip strong{color:#4c4b46;font-weight:750}
+    main{padding-bottom:calc(106px + var(--safe-bottom));min-height:calc(100dvh - 98px)}
+    .screen{display:none;animation:screen-in .32s var(--ease) both}
+    .screen.active{display:block}
+    @keyframes screen-in{from{opacity:.3;transform:translateY(8px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+    .section{padding:0 14px;margin-top:23px}
+    .section:first-child{margin-top:0}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:10px}
+    .section-head h2{font-size:19px;line-height:1.18;letter-spacing:-.025em;margin:0;font-weight:820}
+    .section-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+    .text-button{border:0;background:transparent;color:var(--accent);font-size:13px;font-weight:720;padding:7px 0;cursor:pointer;white-space:nowrap}
+    .hero{padding:18px 14px 0}
+    .hero-copy{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .hero h1{font-family:JilemaDisplay,"PingFang SC",sans-serif;font-size:29px;line-height:1.14;letter-spacing:-.02em;margin:0;max-width:285px;font-weight:400}
+    .hero h1 span{color:var(--accent)}
+    .hero-note{font-size:12px;color:var(--muted);margin:8px 0 0;line-height:1.55;max-width:340px}
+    .trust-mark{width:48px;height:48px;border-radius:14px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;flex:none}
+    .trust-mark svg{width:25px;height:25px}
+    .scope-strip{display:flex;align-items:center;gap:0;margin-top:17px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0}
+    .scope-item{flex:1;min-width:0;padding:0 10px;border-right:1px solid var(--line)}
+    .scope-item:first-child{padding-left:0}
+    .scope-item:last-child{border-right:0;padding-right:0}
+    .scope-number{font-size:19px;font-weight:820;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+    .scope-label{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap}
+    .urgent{margin:17px 14px 0;background:var(--accent-soft);border-radius:var(--radius);padding:13px 13px 12px;position:relative;overflow:hidden}
+    .urgent::after{content:"";position:absolute;width:76px;height:76px;border:17px solid rgba(91,79,208,.08);border-radius:50%;right:-24px;top:-30px}
+    .urgent-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
+    .urgent-title{font-size:14px;font-weight:800}
+    .urgent-date{font-size:11px;color:#554caa;font-weight:700}
+    .urgent-row{display:flex;align-items:center;gap:10px;margin-top:10px;position:relative;z-index:1}
+    .urgent-row button{flex:1;min-width:0;border:0;background:#fff;border-radius:10px;padding:9px 10px;text-align:left;cursor:pointer}
+    .urgent-row strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .urgent-row span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+    .question-list{border-top:1px solid var(--line)}
+    .question-row{width:100%;border:0;border-bottom:1px solid var(--line);background:#fff;text-align:left;padding:12px 0;display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:start;cursor:pointer}
+    .question-row:active{background:#fafaf7}
+    .rank{font-size:12px;font-weight:760;color:var(--faint);padding-top:2px;font-variant-numeric:tabular-nums}
+    .q-main{min-width:0}
+    .q-title{font-size:14.5px;font-weight:720;line-height:1.42;letter-spacing:-.01em}
+    .q-meta{display:flex;align-items:center;gap:7px;margin-top:5px;color:var(--muted);font-size:11px;min-width:0}
+    .q-meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .status-dot{width:6px;height:6px;border-radius:50%;flex:none;background:var(--green)}
+    .status-dot.verify{background:var(--orange)}
+    .status-dot.gap{background:var(--red)}
+    .chevron{width:18px;height:18px;color:#aaa9a2;margin-top:1px}
+    .directory-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .directory-preview{border-top:1px solid var(--line)}
+    .preview-row{width:100%;min-height:54px;border:0;border-bottom:1px solid var(--line);background:#fff;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;cursor:pointer}
+    .preview-row strong{display:block;font-size:14px}
+    .preview-row span{display:block;font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .preview-row .chevron{margin:0}
+    .directory-card{border:1px solid var(--line);background:#fff;border-radius:var(--radius);padding:12px;min-height:108px;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:transform .16s var(--ease),border-color .16s}
+    .directory-card:active{transform:scale(.98)}
+    .directory-card:hover{border-color:#b9b4e9}
+    .dir-icon{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;color:var(--accent);background:var(--accent-soft)}
+    .dir-icon svg{width:17px;height:17px}
+    .directory-card:nth-child(4n+2) .dir-icon{background:var(--green-soft);color:var(--green)}
+    .directory-card:nth-child(4n+3) .dir-icon{background:var(--orange-soft);color:var(--orange)}
+    .directory-card:nth-child(4n+4) .dir-icon{background:var(--blue-soft);color:var(--blue)}
+    .dir-name{font-size:14px;font-weight:780;margin-top:12px;line-height:1.3}
+    .dir-count{font-size:11px;color:var(--muted);margin-top:3px}
+    .source-band{display:flex;gap:8px;overflow:auto;padding-bottom:4px;scroll-snap-type:x proximity}
+    .source-card{flex:0 0 188px;border:1px solid var(--line);border-radius:var(--radius);padding:12px;background:#fff;scroll-snap-align:start}
+    .source-type{font-size:10px;color:var(--green);font-weight:800;margin-bottom:8px}
+    .source-card strong{font-size:13px;display:block;line-height:1.35}
+    .source-card p{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 0}
+    .guide-card{margin:23px 14px 0;border:1px solid var(--line);border-radius:var(--radius);padding:13px;background:#fbfbf9}
+    .guide-card h3{font-size:14px;margin:0 0 9px}
+    .guide-row{display:flex;align-items:flex-start;gap:9px;margin-top:8px;font-size:12px;color:var(--muted);line-height:1.45}
+    .guide-row i{width:8px;height:8px;border-radius:50%;margin-top:4px;background:var(--green);flex:none}
+    .guide-row:nth-child(3) i{background:var(--orange)}
+    .guide-row:nth-child(4) i{background:var(--red)}
+    .category-stack{border-top:1px solid var(--line)}
+    .category-line{width:100%;background:#fff;border:0;border-bottom:1px solid var(--line);padding:14px 0;display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;text-align:left;align-items:center;cursor:pointer}
+    .category-line .dir-icon{width:38px;height:38px;border-radius:11px}
+    .category-line strong{display:block;font-size:14.5px}
+    .category-line span{display:block;color:var(--muted);font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .empty{padding:58px 24px;text-align:center}
+    .empty-icon{width:54px;height:54px;margin:0 auto 13px;border-radius:16px;background:#f1f0fb;color:var(--accent);display:grid;place-items:center}
+    .empty-icon svg{width:27px;height:27px}
+    .empty h3{font-size:16px;margin:0}
+    .empty p{font-size:12px;color:var(--muted);line-height:1.55;margin:7px auto 16px;max-width:250px}
+    .primary-button{height:44px;border:0;border-radius:12px;background:var(--ink);color:#fff;font-weight:750;padding:0 17px;cursor:pointer}
+    .ai-fab{position:fixed;z-index:32;right:max(16px,calc((100vw - 430px)/2 + 16px));bottom:calc(18px + var(--safe-bottom));height:58px;border:0;border-radius:16px;background:var(--ink);color:#fff;padding:0 17px 0 13px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 32px rgba(25,25,22,.24);cursor:pointer;transition:transform .18s var(--ease),box-shadow .18s}
+    .ai-fab:active{transform:scale(.96);box-shadow:0 7px 20px rgba(25,25,22,.2)}
+    .ai-fab-icon{width:34px;height:34px;border-radius:10px;background:#fff;color:var(--ink);display:grid;place-items:center;position:relative}
+    .ai-fab-icon::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;right:-2px;top:-2px;background:#78a82f;border:2px solid var(--ink)}
+    .ai-fab svg{width:21px;height:21px}
+    .ai-fab-copy{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+    .ai-fab-copy strong{font-size:14px}
+    .ai-fab-copy small{font-size:9px;color:#cfcec8;margin-top:5px;font-weight:650}
+    .drawer-shell{position:fixed;inset:0;z-index:42;width:min(100%,430px);margin:0 auto;background:rgba(20,20,18,.34);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility 0s linear .28s}
+    .drawer-shell.open{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+    .directory-drawer{height:100%;width:min(88%,360px);background:#fff;box-shadow:18px 0 55px rgba(24,24,21,.2);transform:translateX(-104%);transition:transform .32s var(--ease);overflow:auto;padding-bottom:28px}
+    .drawer-shell.open .directory-drawer{transform:none}
+    .drawer-head{position:sticky;top:0;z-index:2;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);padding:10px 10px 11px 15px;backdrop-filter:blur(14px)}
+    .drawer-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .drawer-title{font-family:JilemaDisplay,"PingFang SC",sans-serif;font-size:24px;font-weight:400;margin:0}
+    .drawer-head p{font-size:11px;color:var(--muted);line-height:1.45;margin:2px 44px 0 0}
+    .drawer-context{margin:13px 14px 9px;padding:10px 11px;background:#f5f4fb;border-radius:11px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .drawer-context span{font-size:11px;color:var(--muted)}
+    .drawer-context strong{font-size:12px;color:#49428e}
+    .drawer-list{padding:0 14px}
+    .ai-view{position:fixed;inset:0;z-index:47;background:#fff;width:min(100%,430px);margin:0 auto;transform:translateX(105%);opacity:0;visibility:hidden;pointer-events:none;transition:transform .32s var(--ease),opacity .2s ease,visibility 0s linear .32s;overflow:hidden;display:flex;flex-direction:column}
+    .ai-view.open{transform:none;opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+    .ai-head-meta{display:flex;flex-direction:column;align-items:center;line-height:1.15}
+    .ai-head-meta strong{font-size:13px}
+    .ai-head-meta small{font-size:9.5px;color:var(--green);font-weight:720;margin-top:3px}
+    .ai-thread{flex:1;overflow:auto;padding:22px 15px 118px;scroll-behavior:smooth}
+    .ai-intro{padding:9px 1px 20px;border-bottom:1px solid var(--line)}
+    .ai-intro-mark{width:42px;height:42px;border-radius:13px;background:var(--ink);color:#fff;display:grid;place-items:center;margin-bottom:15px}
+    .ai-intro-mark svg{width:23px;height:23px}
+    .ai-intro h1{font-family:JilemaDisplay,"PingFang SC",sans-serif;font-size:27px;font-weight:400;line-height:1.18;margin:0}
+    .ai-intro p{font-size:12.5px;color:var(--muted);line-height:1.6;margin:8px 0 0;max-width:350px}
+    .ai-context{display:inline-flex;align-items:center;gap:6px;margin-top:13px;font-size:11px;color:#4e478f;background:var(--accent-soft);border-radius:8px;padding:7px 9px;font-weight:700}
+    .ai-suggestions{display:grid;gap:7px;margin-top:17px}
+    .ai-suggestion{width:100%;min-height:44px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;font-size:13px;font-weight:680;cursor:pointer}
+    .ai-suggestion:active{background:#f7f7f4}
+    .ai-suggestion svg{width:17px;height:17px;color:var(--faint);flex:none}
+    .ai-message{margin-top:20px}
+    .user-message{display:flex;justify-content:flex-end}
+    .user-message span{max-width:82%;background:var(--accent-soft);color:#29245a;border-radius:14px 14px 4px 14px;padding:10px 12px;font-size:13px;line-height:1.5}
+    .assistant-message{padding-top:3px}
+    .assistant-label{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);font-weight:750;margin-bottom:8px}
+    .assistant-label i{width:22px;height:22px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-style:normal;font-size:9px}
+    .assistant-answer{font-size:14px;line-height:1.7;color:#302f2b}
+    .assistant-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px;font-size:10.5px;color:var(--muted)}
+    .answer-link{margin-top:12px;min-height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;font-size:12px;font-weight:720;text-align:left;cursor:pointer}
+    .answer-link svg{width:17px;height:17px;flex:none}
+    .ai-compose{position:absolute;left:0;right:0;bottom:0;padding:9px 12px calc(10px + var(--safe-bottom));background:rgba(255,255,255,.97);border-top:1px solid var(--line);backdrop-filter:blur(14px)}
+    .ai-form{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px;align-items:end}
+    .ai-form textarea{min-height:44px;max-height:104px;resize:none;border:1px solid var(--line);border-radius:12px;background:#f7f7f4;color:var(--ink);padding:11px 12px;font:16px/1.35 inherit;outline:0}
+    .ai-form textarea:focus{background:#fff;border-color:#aaa3e9}
+    .ai-send{width:44px;height:44px;border:0;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;cursor:pointer}
+    .ai-send:disabled{background:#d8d7d1;color:#98978f;cursor:default}
+    .ai-send svg{width:20px;height:20px}
+    .detail{position:fixed;inset:0;z-index:50;background:var(--surface);width:min(100%,430px);margin:0 auto;transform:translateX(105%);opacity:0;visibility:hidden;pointer-events:none;transition:transform .32s var(--ease),opacity .2s ease,visibility 0s linear .32s;overflow:auto;padding-bottom:30px}
+    .detail.open{transform:none;opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+    .detail-top{position:sticky;top:0;z-index:2;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;backdrop-filter:blur(14px)}
+    .icon-button{width:44px;height:44px;border:0;background:transparent;border-radius:11px;display:grid;place-items:center;cursor:pointer}
+    .icon-button:active{background:#f2f2ee}
+    .icon-button svg{width:22px;height:22px}
+    .icon-button.saved svg{fill:var(--accent-soft);color:var(--accent)}
+    .detail-label{font-size:12px;color:var(--muted);font-weight:700}
+    .detail-body{padding:21px 16px 40px}
+    .detail-status{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 9px;border-radius:8px;background:var(--green-soft);color:var(--green);font-size:11px;font-weight:780}
+    .detail-status.verify{background:var(--orange-soft);color:var(--orange)}
+    .detail-status.gap{background:var(--red-soft);color:var(--red)}
+    .detail h1{font-size:25px;line-height:1.32;letter-spacing:-.035em;margin:13px 0 0}
+    .detail h1,.category-hero h1{font-family:JilemaDisplay,"PingFang SC",sans-serif;font-weight:400;letter-spacing:-.01em}
+    .answer{font-size:15px;line-height:1.75;margin:18px 0 0;color:#32312d}
+    .answer-box{margin-top:22px;padding:13px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .meta-row{display:flex;justify-content:space-between;gap:14px;padding:7px 0;font-size:12px}
+    .meta-row span{color:var(--muted)}
+    .meta-row strong{text-align:right;font-weight:720}
+    .source-list{margin-top:24px}
+    .source-list h2,.steps h2{font-size:16px;margin:0 0 9px}
+    .source-link{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+    .source-link svg{width:20px;height:20px;color:var(--green);flex:none;margin-top:1px}
+    .source-link strong{display:block;font-size:13px;line-height:1.4}
+    .source-link span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+    .steps{margin-top:24px}
+    .step{display:grid;grid-template-columns:23px minmax(0,1fr);gap:9px;font-size:13px;line-height:1.55;margin-top:9px}
+    .step b{width:23px;height:23px;border-radius:7px;background:#f0effa;color:var(--accent);font-size:11px;display:grid;place-items:center}
+    .category-view{position:fixed;inset:0;z-index:45;background:#fff;width:min(100%,430px);margin:0 auto;transform:translateX(105%);opacity:0;visibility:hidden;pointer-events:none;transition:transform .32s var(--ease),opacity .2s ease,visibility 0s linear .32s;overflow:auto;padding-bottom:30px}
+    .category-view.open{transform:none;opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+    .category-hero{padding:18px 15px 16px;background:#f7f7f4;border-bottom:1px solid var(--line)}
+    .category-hero h1{font-size:25px;margin:12px 0 4px;letter-spacing:-.035em}
+    .category-hero p{font-size:12px;color:var(--muted);margin:0;line-height:1.55}
+    .topic-wrap{padding:17px 14px 0}
+    .topic-wrap h2{font-size:16px;margin:0 0 10px}
+    .topic-cloud{display:flex;flex-wrap:wrap;gap:7px}
+    .topic-chip{min-height:34px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;font-size:12px;color:#4f4e48}
+    .related{padding:4px 14px 30px;margin-top:22px}
+    .related h2{font-size:16px;margin:0 0 8px}
+    dialog{border:0;padding:0;background:transparent;max-width:none;max-height:none}
+    dialog::backdrop{background:rgba(20,20,18,.36)}
+    .sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,430px);background:#fff;border-radius:18px 18px 0 0;padding:9px 14px calc(18px + var(--safe-bottom));box-shadow:0 -14px 50px rgba(25,25,22,.16)}
+    .sheet-handle{width:36px;height:4px;background:#d5d4ce;border-radius:5px;margin:0 auto 15px}
+    .sheet h2{font-size:18px;margin:0 0 5px}
+    .sheet p{font-size:12px;color:var(--muted);margin:0 0 13px}
+    .campus-list{border-top:1px solid var(--line)}
+    .campus-option{width:100%;height:49px;border:0;border-bottom:1px solid var(--line);background:#fff;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+    .campus-option strong{font-size:14px}
+    .campus-option svg{width:18px;color:var(--accent);opacity:0}
+    .campus-option.selected svg{opacity:1}
+    .search-results{display:none;padding:10px 14px 100px}
+    .search-results.active{display:block}
+    .search-summary{font-size:12px;color:var(--muted);padding:4px 0 11px;border-bottom:1px solid var(--line)}
+    .hidden-by-search{display:none!important}
+    @media(min-width:700px){
+      body{padding:24px 0;background:#e9e9e4}
+      .app{min-height:calc(100dvh - 48px);border-radius:22px;box-shadow:var(--shadow)}
+      .ai-fab{bottom:42px}
+      .drawer-shell,.detail,.category-view,.ai-view{top:24px;bottom:24px;inset-inline:0;height:calc(100dvh - 48px);border-radius:22px;box-shadow:var(--shadow)}
+      .directory-drawer{border-radius:22px 0 0 22px}
+      .sheet{bottom:24px;border-radius:18px;width:402px}
+    }
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.screen,.drawer-shell,.directory-drawer,.detail,.category-view,.ai-view{animation:none;transition:none}}
+  </style>
+</head>
+<body>
+  <!--
+  THESIS: 校园知识库首先是一套可信的行动指引，拒绝把内容堆成百科卡片墙。
+  OWN-WORLD: 纯白高密度移动画布，深墨正文、克制紫色行动、绿橙红三档可信状态，线性列表承载阅读。
+  STORY: 用户先搜索或选择校区，再从高频问题与完整目录进入答案，并在行动前确认来源和时效。
+  FIRST VIEWPORT: 顶栏品牌与校区、置顶搜索、可信说明、四项范围数字、当前重要事项和高频问题开头。
+  FORM: 可信来源枢纽，候选结构第六项，seed c055f64c。
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+  -->
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="topline">
+        <div class="brand-group">
+          <button class="menu-button" id="openDirectory" aria-label="打开校园知识目录" aria-haspopup="dialog">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16M4 12h16M4 17h11"/></svg>
+          </button>
+          <div class="brand">暨了么 <small>校园知识库</small></div>
+        </div>
+        <button class="campus-button" id="campusButton" aria-label="选择校区">
+          <span id="campusLabel">全部校区</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+      </div>
+      <label class="search">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="搜缴费、宿舍、选课、医保……" aria-label="搜索校园问题">
+      </label>
+    </header>
+    <div class="demo-strip"><strong>范围 Demo</strong><span>数据核验截至 2026-08-20 · 99 条知识底座</span></div>
+
+    <main>
+      <div id="searchResults" class="search-results" aria-live="polite"></div>
+
+      <section class="screen active" data-screen="home">
+        <div class="hero">
+          <div class="hero-copy">
+            <div>
+              <h1>把学校散落的信息，变成<span>能照着做</span>的答案。</h1>
+              <p class="hero-note" id="contextHint">先确认校区、身份和时间，再给答案。旧通知不会被冒充成今年政策。</p>
+            </div>
+            <div class="trust-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 5 6v5c0 4.7 2.8 8.3 7 10 4.2-1.7 7-5.3 7-10V6l-7-3Z"/><path d="m8.5 12 2.2 2.1 4.8-5"/></svg>
+            </div>
+          </div>
+          <div class="scope-strip" aria-label="知识库范围">
+            <div class="scope-item"><div class="scope-number">99</div><div class="scope-label">具体知识</div></div>
+            <div class="scope-item"><div class="scope-number">36</div><div class="scope-label">常见 QA</div></div>
+            <div class="scope-item"><div class="scope-number">14</div><div class="scope-label">完整领域</div></div>
+            <div class="scope-item"><div class="scope-number">182</div><div class="scope-label">细分主题</div></div>
+          </div>
+        </div>
+
+        <div class="urgent">
+          <div class="urgent-top"><div class="urgent-title">现在最值得确认</div><div class="urgent-date">2026 新生季</div></div>
+          <div class="urgent-row">
+            <button data-open-question="undergrad-time"><strong>本科报到时间</strong><span>等待官方原文复核</span></button>
+            <button data-open-question="course-time"><strong>第一学期选课</strong><span>6月25日—9月25日</span></button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><div><h2>大家最近都在问</h2><p>按新生阶段和公开讨论共识整理</p></div><button class="text-button" data-open-directory>查看全部</button></div>
+          <div class="question-list" id="topQuestions"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><div><h2>从哪一类开始找</h2><p>首页展示高频入口，完整 14 类从左侧目录展开</p></div><button class="text-button" data-open-directory>完整目录</button></div>
+          <div class="directory-preview" id="homeDirectory"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><div><h2>答案从哪里来</h2><p>学生经验负责发现问题，官方页面负责确认事实</p></div></div>
+          <div class="source-band">
+            <article class="source-card"><div class="source-type">一级事实源</div><strong>学校与校区官网</strong><p>主站、番禺、珠海、深圳校区，以及当年迎新通知。</p></article>
+            <article class="source-card"><div class="source-type">专业事实源</div><strong>校内部门官网</strong><p>本科生院、学生处、网络中心、财务处、公医办、图书馆。</p></article>
+            <article class="source-card"><div class="source-type">问题发现源</div><strong>公众号与学生平台</strong><p>发现真实问法；未经官网核验，不直接写成政策答案。</p></article>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <h3>怎么看答案状态？</h3>
+          <div class="guide-row"><i></i><span><strong>已核验：</strong>长期规则或当前正式通知，可以进入上线审核。</span></div>
+          <div class="guide-row"><i></i><span><strong>需要复核：</strong>有官方依据，但入口、电话或年份可能变化。</span></div>
+          <div class="guide-row"><i></i><span><strong>待补齐：</strong>没有全校统一答案，会告诉你下一步找谁确认。</span></div>
+        </div>
+      </section>
+
+    </main>
+    <button class="ai-fab" id="openAI" aria-label="向暨了么 AI 提问" aria-haspopup="dialog">
+      <span class="ai-fab-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 5h14v11H9l-4 3V5Z"/><path d="m12 8 .55 1.45L14 10l-1.45.55L12 12l-.55-1.45L10 10l1.45-.55L12 8Z"/></svg></span>
+      <span class="ai-fab-copy"><strong>问 AI</strong><small>校园知识助手</small></span>
+    </button>
+  </div>
+
+  <aside class="drawer-shell" id="directoryDrawer" role="dialog" aria-modal="true" aria-label="校园知识目录" tabindex="-1">
+    <div class="directory-drawer">
+      <header class="drawer-head">
+        <div class="drawer-title-row"><h1 class="drawer-title">校园知识目录</h1><button class="icon-button" id="closeDirectory" aria-label="关闭目录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+        <p>14 个领域、182 个主题。找到方向后，再看具体答案和来源。</p>
+      </header>
+      <div class="drawer-context"><span>当前优先范围</span><strong id="drawerCampus">全部校区</strong></div>
+      <div class="drawer-list"><div class="category-stack" id="directoryList"></div></div>
+    </div>
+  </aside>
+
+  <section class="category-view" id="categoryView" role="dialog" aria-modal="true" aria-label="分类详情" tabindex="-1">
+    <header class="detail-top"><button class="icon-button" id="closeCategory" aria-label="返回目录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m15 18-6-6 6-6"/></svg></button><span class="detail-label">知识目录</span><span style="width:44px"></span></header>
+    <div id="categoryContent"></div>
+  </section>
+
+  <section class="ai-view" id="aiView" role="dialog" aria-modal="true" aria-label="暨了么 AI 校园问答" tabindex="-1">
+    <header class="detail-top">
+      <button class="icon-button" id="closeAI" aria-label="返回首页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="ai-head-meta"><strong>暨了么 AI</strong><small>基于 99 条校园知识</small></span>
+      <span style="width:44px" aria-hidden="true"></span>
+    </header>
+    <div class="ai-thread" id="aiThread">
+      <div class="ai-intro" id="aiIntro">
+        <div class="ai-intro-mark"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 5h14v11H9l-4 3V5Z"/><path d="m12 8 .55 1.45L14 10l-1.45.55L12 12l-.55-1.45L10 10l1.45-.55L12 8Z"/></svg></div>
+        <h1>有校园问题，直接问。</h1>
+        <p>我会优先使用首页里已核验的知识。资料过期、缺少校区条件或没有统一答案时，也会明确告诉你。</p>
+        <div class="ai-context" id="aiContext">全部校区 · 本科新生</div>
+        <div class="ai-suggestions">
+          <button class="ai-suggestion" data-ai-prompt="2026级本科什么时候报到？"><span>2026级本科什么时候报到？</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>
+          <button class="ai-suggestion" data-ai-prompt="番禺校区怎么去？"><span>番禺校区怎么去？</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>
+          <button class="ai-suggestion" data-ai-prompt="新生怎样激活 JNUID？"><span>新生怎样激活 JNUID？</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>
+          <button class="ai-suggestion" data-ai-prompt="宿舍床多大？"><span>宿舍床多大？</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+      </div>
+      <div id="aiMessages" aria-live="polite"></div>
+    </div>
+    <div class="ai-compose">
+      <form class="ai-form" id="aiForm">
+        <textarea id="aiInput" rows="1" maxlength="180" placeholder="例如：番禺校区宿舍热水怎么用？" aria-label="向暨了么 AI 提问"></textarea>
+        <button class="ai-send" id="aiSend" type="submit" aria-label="发送问题" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m5 12 14-7-5 14-2.5-5.5L5 12Z"/><path d="m11.5 13.5 3-3"/></svg></button>
+      </form>
+    </div>
+  </section>
+
+  <article class="detail" id="detailView" role="dialog" aria-modal="true" aria-label="问题详情" tabindex="-1">
+    <header class="detail-top"><button class="icon-button" id="closeDetail" aria-label="返回"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m15 18-6-6 6-6"/></svg></button><span class="detail-label">答案详情</span><button class="icon-button" id="saveQuestion" aria-label="收藏问题"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 4h12v17l-6-4-6 4V4Z"/></svg></button></header>
+    <div class="detail-body" id="detailBody"></div>
+  </article>
+
+  <dialog id="campusDialog">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2>你主要在哪个校区？</h2>
+      <p>这是低频设置，但会明显影响宿舍、交通、食堂和维修答案。</p>
+      <div class="campus-list" id="campusList"></div>
+    </div>
+  </dialog>
+
+  <script>
+    const ICONS={
+      arrival:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16M6 20V9l6-5 6 5v11M9 13h6M9 16h6"/></svg>',
+      card:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg>',
+      home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 10 8-7 8 7v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg>',
+      map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></svg>',
+      health:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.2-8 11-8 11Z"/><path d="M8 12h2l1-2 2 4 1-2h2"/></svg>',
+      academic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 8 9-5 9 5-9 5-9-5Z"/><path d="M6 10.5V16c3 2.3 9 2.3 12 0v-5.5M21 8v7"/></svg>',
+      book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5c3-1 5 0 8 2v13c-3-2-5-3-8-2V5ZM20 5c-3-1-5 0-8 2v13c3-2 5-3 8-2V5Z"/></svg>',
+      shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 5 6v5c0 4.7 2.8 8.3 7 10 4.2-1.7 7-5.3 7-10V6l-7-3Z"/></svg>',
+      people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c.6-4 2.4-6 5.5-6s4.9 2 5.5 6M16 5a3 3 0 0 1 0 6M16.5 14c2.4.5 3.7 2.5 4 6"/></svg>',
+      cert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-3-6 3V3Z"/><path d="M9 8h6M9 12h6"/></svg>',
+      career:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M3 12h18M10 12v2h4v-2"/></svg>',
+      globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>',
+      alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5M12 17h.01"/></svg>',
+      graduate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 8 9-5 9 5-9 5-9-5Z"/><path d="M7 11v5c3 2 7 2 10 0v-5M21 8v8"/></svg>'
+    };
+
+    const categories=[
+      {id:'arrival',name:'录取与报到',icon:'arrival',desc:'从收到录取到完成入学',topics:['录取通知书与档案','迎新系统','报到时间与地点','报到材料','户口迁移','党团关系转接','兵役登记','绿色通道','家长陪同','延期报到与请假','校区交通','行李与快递']},
+      {id:'identity',name:'身份、缴费与账户',icon:'card',desc:'学校系统和支付身份',topics:['学费与住宿费','缴费平台','缴费票据','助学贷款抵扣','银行卡绑定','JNUID','统一身份认证','校园卡领取','校园卡充值','校园卡挂失补办','门禁','学生证与火车票优惠','学子邮箱','网上服务大厅']},
+      {id:'housing',name:'住宿与日常生活',icon:'home',desc:'宿舍、食堂和生活服务',topics:['宿舍分配','床位尺寸','空调与水电','热水与洗衣','宿舍网络','宿舍报修','门禁与晚归','校外住宿','食堂与营业时间','清真餐','快递点','打印复印','超市与生活服务','失物招领','校历与节假日']},
+      {id:'transport',name:'交通与校园空间',icon:'map',desc:'五校区移动与空间使用',topics:['五校区地图','校门与教学楼','校区接驳','公交地铁','共享单车','电动车规则','停车','体育场馆','自习空间','无障碍设施','校园参观','校区之间办事']},
+      {id:'health',name:'医疗、医保与身心健康',icon:'health',desc:'就医、报销与心理支持',topics:['入学体检','校门诊就医','学生医保参保','医保卡与电子凭证','门诊报销','住院报销','异地就医','转诊','疫苗与传染病','请病假','心理咨询预约','心理危机求助','常用急救与校内 AED','女性健康','残障与特殊支持']},
+      {id:'academics',name:'培养、学籍与教学',icon:'academic',desc:'选课、成绩和毕业要求',topics:['培养方案','学分与绩点','课程表','选课与退补选','课程冲突','免修缓考重修','考试纪律','成绩复核','学籍注册','休学复学退学','转专业','辅修与微专业','交换课程认定','毕业与学位条件','教学评价','教材与课程平台']},
+      {id:'learning',name:'学习资源与科研',icon:'book',desc:'图书馆、科研和竞赛',topics:['图书馆入馆','借阅与续借','座位预约','电子数据库','校外访问','论文查重','文献传递','实验室安全','科研训练','大创项目','学科竞赛','导师与学术讲座','写作与引用规范','AI 学习工具规范']},
+      {id:'funding',name:'资助、奖惩与权益',icon:'shield',desc:'经济支持和学生权益',topics:['家庭经济困难认定','国家助学金','国家助学贷款','奖学金','勤工助学','临时困难补助','学费减免','评优评先','处分与申诉','投诉与校长信箱','信息公开','个人信息保护','反骚扰与反歧视支持']},
+      {id:'community',name:'社团、成长与校园参与',icon:'people',desc:'社团、志愿和校园活动',topics:['学生组织','社团招新','志愿服务','第二课堂','校园媒体','文体活动','讲座与比赛','创新创业','领导力与项目经验','朋辈互助','导师与学长学姐','港澳台侨学生融入']},
+      {id:'certificates',name:'考证与升学',icon:'cert',desc:'考试、推免与深造',topics:['英语四六级','普通话考试','计算机等级考试','教师资格证','法律职业资格','CPA/CFA/ACCA 等专业证书','考研规划','保研推免','考公考编','留学申请','港澳升学','成绩单与在读证明','推荐信与档案']},
+      {id:'career',name:'职业规划、实习与就业',icon:'career',desc:'从探索方向到完成就业',topics:['职业兴趣探索','生涯咨询','简历与面试','实习信息','校招与宣讲会','就业推荐表','三方协议','毕业去向登记','基层就业','创业支持','劳动合同','实习权益与求职防骗','校友与行业导师']},
+      {id:'international',name:'国际交流与港澳台侨事务',icon:'globe',desc:'交换、出境与国际服务',topics:['交换项目','联合培养','出国境手续','学分转换','奖学金','签证与保险','港澳台侨生政策','国际学生服务','境外安全','跨校区与跨境实习']},
+      {id:'safety',name:'安全、求助与应急',icon:'alert',desc:'紧急电话与风险处理',topics:['校园报警','消防与疏散','网络诈骗','银行卡与账号安全','宿舍安全','实验室事故','交通事故','极端天气','紧急医疗','失联与人身安全','举报与求助','常用官方值班电话']},
+      {id:'graduation',name:'离校、毕业与校友',icon:'graduate',desc:'毕业手续和离校之后',topics:['毕业审核','论文与答辩','离校手续','校园卡销户','宿舍退宿','档案与户口','毕业证学位证','学历学位认证','校友邮箱','校友服务','补办证明']}
+    ];
+
+    const questions=[
+      {id:'campus-address',rank:1,cat:'transport',q:'暨南大学五个校区分别在哪里？',a:'石牌校区位于广州市天河区黄埔大道西601号；番禺校区位于广州市番禺区兴业大道东855号；珠海校区位于珠海市香洲区前山路206号；广园东校区位于广州市天河区瘦狗岭路377号；深圳校区位于深圳市南山区侨城东街6号。报到时仍要以学院通知中的具体校门和报到点为准。',status:'reviewed',campus:'全部校区',checked:'2026-08-20',source:'暨南大学官网 · 校区地址',sourceUrl:'https://www.jnu.edu.cn/',steps:['先根据录取学院确认所属校区','导航时输入完整校区名称和地址','报到前核对学院指定的校门或报到点']},
+      {id:'undergrad-time',rank:2,cat:'arrival',q:'2026级内招本科新生什么时候报到？',a:'公开搜索目前找到的“暨南大学本科招生”公众号转载镜像显示，报到时间为2026年9月8日8:00—22:00。但还没有在本科招生官网找到同等清晰的原文，因此必须以录取通知书、招生官网或公众号原文再次确认。',status:'verify',campus:'全部校区',checked:'2026-08-20',source:'暨南大学本科招生公众号转载镜像',sourceUrl:'https://app.gaokaozhitongche.com/newsguide/h/MNbPWv0g',steps:['检查录取通知书及随附入学须知','关注暨南大学本科招生公众号原文','不要只凭转载页面安排不可退改行程']},
+      {id:'materials',rank:3,cat:'arrival',q:'2026级本科新生报到要带哪些材料？',a:'目前公开检索还没有找到一份可直接核验的2026级内招本科报到材料总表。请以本人录取通知书随附材料、“暨南大学本科招生”公众号原文和学院通知为准，不照搬往届清单。',status:'gap',campus:'全部校区',checked:'2026-08-20',source:'等待2026级本科官方原文',sourceUrl:'',steps:['检查录取通知书及随附材料','关注招生官网和官方公众号','重要材料准备原件、复印件和电子扫描件']},
+      {id:'payment',rank:4,cat:'identity',q:'学杂费从哪里缴？',a:'财务处公开入口为学校自助缴费平台；电脑可从暨南大学新门户搜索“自助缴费平台”，也可通过暨南大学服务号进入财务大厅。不要向普通学校银行账户直接汇学杂费。',status:'verify',campus:'全部校区',checked:'2026-08-20',source:'暨南大学财务与国有资产管理处',sourceUrl:'https://cwc.jnu.edu.cn/4167/list.psp',steps:['进入新门户或暨南大学服务号','核对本人缴费项目和金额','通过正式缴费入口完成支付','保存电子票据']},
+      {id:'jnuid',rank:5,cat:'identity',q:'新生第一次怎样激活 JNUID？',a:'访问学校融合门户，在登录框下点击“JNUID 激活/忘记密码”；输入新生学号，通过报考时登记的手机号或邮箱接收验证码，再设置强密码。',status:'reviewed',campus:'全部校区',checked:'2026-08-20',source:'网络与教育技术中心 · 新生登录说明',sourceUrl:'https://netc.jnu.edu.cn/2023/0814/c10374a760871/page.htm',steps:['打开暨南大学融合门户','点击JNUID激活/忘记密码','填写学号并完成验证','设置强密码']},
+      {id:'dorm',rank:6,cat:'housing',q:'宿舍是几人间？床多大？有独立卫浴吗？',a:'没有全校统一答案。暨大有五个校区，不同校区、宿舍楼和房型的住宿人数、床位尺寸、卫浴和空调配置可能不同。知识库必须先知道校区和宿舍楼，才能给出可靠答案。',status:'gap',campus:'需要选择校区与楼栋',checked:'2026-08-20',source:'等待逐校区、逐楼栋核验',sourceUrl:'',steps:['先确认录取学院和校区','收到宿舍分配后确认楼栋','购买床品前向宿管或校区后勤确认']},
+      {id:'hot-water',rank:7,cat:'housing',q:'宿舍热水几点供应？洗衣机在哪里？',a:'目前没有覆盖五校区全部宿舍楼的统一时间表。热水供应、洗衣设备和支付方式可能按校区、楼栋与维护状态变化，应先选择校区和宿舍楼，再查看宿管或物业通知。',status:'gap',campus:'需要选择校区与楼栋',checked:'2026-08-20',source:'等待逐楼栋设施表',sourceUrl:'',steps:['确认校区和宿舍楼','查看楼栋公告或宿管通知','设备故障时向宿管或物业报修']},
+      {id:'network',rank:8,cat:'identity',q:'新生怎样开通校园网？',a:'新生先激活JNUID，再进入校园网用户自助服务平台办理网络账户。实际套餐、认证方式和宿舍网络接入应以网络中心当年新生指南为准。',status:'verify',campus:'全部校区',checked:'2026-08-20',source:'网络与教育技术中心 · 新生信息服务指南',sourceUrl:'https://netc.jnu.edu.cn/2020/0910/c108a513451/page.htm',steps:['先激活JNUID','进入MyNET用户自助服务平台','按提示办理校园网服务','无法连接时通过MyNET报修']},
+      {id:'course-time',rank:9,cat:'academics',q:'2026—2027学年第一学期什么时候选课？',a:'本科生院通知公布的本学期本科选课总体时间为2026年6月25日至9月25日，具体轮次、对象和课程操作时间应查看完整通知及教务系统。',status:'reviewed',campus:'全部校区',checked:'2026-08-20',source:'本科生院 · 2026—2027第一学期选课通知',sourceUrl:'https://jwc.jnu.edu.cn/2026/0618/c6765a857377/page.htm',steps:['登录本科教务管理系统','阅读完整选课轮次安排','核对培养方案和先修要求','在截止前检查选课结果']},
+      {id:'transfer',rank:10,cat:'academics',q:'本科生怎样申请转专业？',a:'转专业需要以当学年本科生院通知为准，通常包括学生申请、学院审核、接收学院考核和结果公示等环节。当前知识库保存的是2025—2026学年流程，只能作为参考。',status:'verify',campus:'全部校区',checked:'2026-08-20',source:'本科生院 · 转专业工作通知',sourceUrl:'https://jwc.jnu.edu.cn/2026/0424/c6765a854250/page.htm',steps:['等待当学年正式通知','核对申请资格和接收计划','按学院要求提交材料','参加接收学院考核']},
+      {id:'gpa',rank:11,cat:'academics',q:'暨大的绩点怎么计算？',a:'知识库尚未取得并复核最新版科生学籍管理规定中的完整绩点公式。不同培养类型和课程性质可能有特殊规则，暂时不提供自行推算结果，应以教务系统和学校正式制度为准。',status:'gap',campus:'全部校区',checked:'2026-08-20',source:'等待复核最新学籍管理规定',sourceUrl:'',steps:['先查看教务系统官方绩点','核对本人培养类型适用规则','奖学金、转专业或推免使用学校官方结果']},
+      {id:'cet',rank:12,cat:'certificates',q:'报考英语六级需要什么条件？',a:'2026年上半年暨大通知规定，报考六级需要四级成绩不低于425分；四级和六级同一考次只能选择一门，报考校区应与学籍校区一致。下一次报名日期需要等待新通知。',status:'verify',campus:'全部校区',checked:'2026-08-20',source:'珠海教务 · 2026年上半年四六级报名通知',sourceUrl:'https://zhjw.jnu.edu.cn/2026/0318/c7164a851927/page.htm',steps:['登录全国CET网上报名系统','核对学籍和可报科目','在学校窗口内报名缴费','再次确认报名状态']},
+      {id:'medical',rank:13,cat:'health',q:'参加广州大学生医保后，第一次去校门诊要带什么？',a:'官方流程要求首次校门诊就医准备本人有效身份证件、学生身份材料，并按公医办要求完成相应登记。由于医保流程页面较旧，上线前还需要复核2026要求。',status:'verify',campus:'广州校区',checked:'2026-08-20',source:'暨南大学公医办 · 医保服务指南',sourceUrl:'https://gyb.jnu.edu.cn/9256/list2.htm',steps:['携带本人有效身份证件','准备学生身份材料','到校门诊按指引登记','不确定时先联系公医办020-85220116']},
+      {id:'psych',rank:14,cat:'health',q:'怎样预约暨南大学心理咨询？',a:'关注“心晴暨南”微信公众号，在菜单中进入心理咨询预约。官方页面写明通常每周五开放下一周名额，并需确认咨询师所在校区；具体菜单和时间仍需实机复核。',status:'verify',campus:'石牌、番禺',checked:'2026-08-20',source:'暨南大学心理健康服务页',sourceUrl:'https://shsy.jnu.edu.cn/41053/list.htm',steps:['关注心晴暨南微信公众号','进入心理咨询预约','选择咨询师、校区和时间','按预约成功提示到场']},
+      {id:'clubs',rank:15,cat:'community',q:'怎样判断学生社团是不是正式备案的？',a:'可查看校团委发布的学生社团年审结果。加入前应核对社团是否在最新年审名单、是否处于整改或注销状态，涉及收费时要求说明用途和审批依据。',status:'verify',campus:'全部校区',checked:'2026-08-20',source:'校团委 · 学生社团年审结果公示',sourceUrl:'https://tw.jnu.edu.cn/2025/0526/c17233a836950/page.htm',steps:['进入暨南大学校团委官网','搜索最新学年年审结果','核对社团名称和状态','警惕无法证明身份的收费组织']},
+      {id:'career',rank:16,cat:'career',q:'学校有没有免费的职业生涯或简历咨询？',a:'有。可在“暨南大学学生就业指导中心”微信公众号进入生涯咨询，或登录网上服务大厅选择学生生涯发展咨询预约。五个校区学生都可以预约线上咨询。',status:'verify',campus:'全部校区',checked:'2026-08-20',source:'学生就业指导中心 · 扬帆职业生涯咨询室',sourceUrl:'https://career.jnu.edu.cn/2025/0615/c28869a838315/page.htm',steps:['进入就业指导中心公众号或网上服务大厅','选择咨询师和时段','提交预约','查看微信或服务大厅通知']},
+      {id:'panyu-transport',rank:17,cat:'transport',q:'从广州主要交通枢纽怎样到番禺校区？',a:'番禺校区2026年交通指南建议先转乘广州地铁4号线到新造站，再步行约1.4公里，或换乘暨南大学至新造地铁站直达专线。广州南站可先乘7号线到大学城南站换乘4号线。',status:'reviewed',campus:'番禺校区',checked:'2026-08-20',source:'番禺校区官网 · 2026交通指南',sourceUrl:'https://panyu.jnu.edu.cn/2026/0724/c2768a861129/page.htm',steps:['在地图中将终点设为暨南大学番禺校区','换乘至地铁4号线新造站','出站后选择步行或校区直达专线','出发当天再看地图和校区通知']},
+      {id:'source-rule',rank:99,cat:'safety',q:'暨了么怎样判断一条校园信息可不可信？',a:'学生经验平台用来发现问题，学校、政府和考试机构页面用来确认事实。每条答案记录校区、身份、核验日期和下一次复核时间。找不到2026正式通知时，会直接告诉你“等待新通知”，不会由AI猜测。',status:'reviewed',campus:'全部校区',checked:'2026-08-20',source:'暨了么校园知识库来源规则',sourceUrl:'',steps:['先看答案状态','核对适用校区和身份','查看核验日期','高风险事项打开官方来源再次确认']}
+    ];
+
+    const campuses=['全部校区','石牌校区','番禺校区','珠海校区','深圳校区','广园东校区'];
+    const state={campus:'全部校区',saved:new Set(JSON.parse(localStorage.getItem('jilema-kb-saved')||'[]')),currentQuestion:null,detailReturn:null,categoryReturn:null,drawerReturn:null,aiReturn:null};
+    const qs=s=>document.querySelector(s), qsa=s=>[...document.querySelectorAll(s)];
+
+    function statusInfo(status){
+      return status==='reviewed'?{label:'已核验',class:''}:status==='verify'?{label:'需要复核',class:'verify'}:{label:'待补齐 · 不猜测',class:'gap'};
+    }
+    function questionRow(q){const s=statusInfo(q.status);return `<button class="question-row" data-open-question="${q.id}"><span class="rank">${q.rank<90?String(q.rank).padStart(2,'0'):''}</span><span class="q-main"><span class="q-title">${q.q}</span><span class="q-meta"><i class="status-dot ${s.class}"></i><span>${s.label}</span><span>·</span><span>${q.campus}</span></span></span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>`}
+    function dirCard(c){return `<button class="directory-card" data-category="${c.id}"><span class="dir-icon">${ICONS[c.icon]}</span><span><span class="dir-name">${c.name}</span><span class="dir-count">${c.topics.length} 个主题</span></span></button>`}
+    function previewRow(c){return `<button class="preview-row" data-category="${c.id}"><span><strong>${c.name}</strong><span>${c.topics.slice(0,4).join('、')}</span></span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>`}
+    function categoryLine(c){return `<button class="category-line" data-category="${c.id}"><span class="dir-icon">${ICONS[c.icon]}</span><span><strong>${c.name}</strong><span>${c.desc} · ${c.topics.slice(0,3).join('、')}</span></span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>`}
+    function campusScore(q){
+      if(state.campus==='全部校区')return 1;
+      const key=state.campus.replace('校区','');
+      if(q.campus.includes(key))return 0;
+      if(q.campus.includes('广州校区')&&['石牌校区','番禺校区','广园东校区'].includes(state.campus))return 0;
+      if(q.campus.includes('全部'))return 1;
+      if(q.campus.includes('需要选择'))return 2;
+      return 3;
+    }
+    function campusQuestions(list=questions){
+      return [...list].filter(q=>state.campus==='全部校区'||campusScore(q)<3).sort((a,b)=>campusScore(a)-campusScore(b)||a.rank-b.rank);
+    }
+    function updateCampusContext(){
+      const hint=state.campus==='全部校区'?'先确认校区、身份和时间，再给答案。旧通知不会被冒充成今年政策。':`已优先展示${state.campus}适用内容；全校通用答案随后显示，其他校区专属内容暂时隐藏。`;
+      qs('#contextHint').textContent=hint;
+    }
+    function renderBase(){
+      qs('#topQuestions').innerHTML=campusQuestions().filter(q=>q.rank<90).slice(0,8).map(questionRow).join('');
+      qs('#homeDirectory').innerHTML=['arrival','identity','housing','academics'].map(id=>previewRow(categories.find(c=>c.id===id))).join('');
+      qs('#directoryList').innerHTML=categories.map(categoryLine).join('');
+      qs('#drawerCampus').textContent=state.campus;
+      qs('#aiContext').textContent=`${state.campus} · 本科新生`;
+      updateCampusContext();bindDynamic();
+    }
+    function bindDynamic(){
+      qsa('[data-open-question]').forEach(el=>el.onclick=()=>openQuestion(el.dataset.openQuestion));
+      qsa('[data-category]').forEach(el=>el.onclick=()=>openCategory(el.dataset.category));
+    }
+    function cleanUrl(){return location.pathname+location.search}
+    function openDirectory(){
+      state.drawerReturn=document.activeElement;qs('#app').inert=true;
+      qs('#directoryDrawer').classList.add('open');setTimeout(()=>qs('#directoryDrawer').focus(),0);
+      history.pushState({drawer:true},'',`${cleanUrl()}#directory`);
+    }
+    function closeDirectory(push=false,keepAppInert=false){
+      qs('#directoryDrawer').classList.remove('open');if(!keepAppInert)qs('#app').inert=false;
+      const target=state.drawerReturn;state.drawerReturn=null;if(!keepAppInert)setTimeout(()=>target?.focus?.(),0);
+      if(push)history.pushState({},'',cleanUrl());
+    }
+    function openAI(){
+      state.aiReturn=document.activeElement;qs('#app').inert=true;qs('#aiView').classList.add('open');
+      setTimeout(()=>qs('#aiInput').focus(),80);history.pushState({ai:true},'',`${cleanUrl()}#ai`);
+    }
+    function closeAI(push=false){
+      qs('#aiView').classList.remove('open');qs('#app').inert=false;
+      const target=state.aiReturn;state.aiReturn=null;setTimeout(()=>target?.focus?.(),0);
+      if(push)history.pushState({},'',cleanUrl());
+    }
+    function openQuestion(id){
+      const q=questions.find(x=>x.id===id);if(!q)return;state.currentQuestion=q;
+      state.detailReturn=document.activeElement;
+      const categoryOpen=qs('#categoryView').classList.contains('open');
+      const aiOpen=qs('#aiView').classList.contains('open');
+      if(categoryOpen)qs('#categoryView').inert=true;else if(aiOpen)qs('#aiView').inert=true;else qs('#app').inert=true;
+      const s=statusInfo(q.status);const saved=state.saved.has(q.id);
+      qs('#saveQuestion').classList.toggle('saved',saved);qs('#saveQuestion').setAttribute('aria-label',saved?'取消收藏':'收藏问题');
+      const source=q.sourceUrl?`<a class="source-link" href="${q.sourceUrl}" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 5 6v5c0 4.7 2.8 8.3 7 10 4.2-1.7 7-5.3 7-10V6l-7-3Z"/><path d="m8.5 12 2.2 2.1 4.8-5"/></svg><span><strong>${q.source}</strong><span>打开原始页面核对</span></span></a>`:`<div class="source-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 5 6v5c0 4.7 2.8 8.3 7 10 4.2-1.7 7-5.3 7-10V6l-7-3Z"/><path d="M9 9l6 6M15 9l-6 6"/></svg><span><strong>${q.source}</strong><span>已进入人工核验队列</span></span></div>`;
+      qs('#detailBody').innerHTML=`<span class="detail-status ${s.class}"><i class="status-dot ${s.class}"></i>${s.label}</span><h1>${q.q}</h1><p class="answer">${q.a}</p><div class="answer-box"><div class="meta-row"><span>适用范围</span><strong>${q.campus}</strong></div><div class="meta-row"><span>最近核验</span><strong>${q.checked}</strong></div></div><div class="steps"><h2>你可以这样做</h2>${q.steps.map((x,i)=>`<div class="step"><b>${i+1}</b><span>${x}</span></div>`).join('')}</div><div class="source-list"><h2>答案依据</h2>${source}</div>`;
+      qs('#detailView').classList.add('open');qs('#detailView').scrollTop=0;setTimeout(()=>qs('#detailView').focus(),0);history.pushState({detail:id},'',`#q=${id}`);
+    }
+    function closeDetail(push=false){
+      qs('#detailView').classList.remove('open');state.currentQuestion=null;
+      if(qs('#categoryView').classList.contains('open'))qs('#categoryView').inert=false;else if(qs('#aiView').classList.contains('open'))qs('#aiView').inert=false;else qs('#app').inert=false;
+      const target=state.detailReturn;setTimeout(()=>target?.focus?.(),0);state.detailReturn=null;
+      if(push)history.pushState({},'',location.pathname+location.search)
+    }
+    function openCategory(id){
+      const c=categories.find(x=>x.id===id);if(!c)return;const related=campusQuestions(questions.filter(q=>q.cat===id));
+      qs('#categoryContent').innerHTML=`<div class="category-hero"><span class="dir-icon">${ICONS[c.icon]}</span><h1>${c.name}</h1><p>${c.desc}。目录完整保留 ${c.topics.length} 个主题，已有答案会优先显示。</p></div><div class="topic-wrap"><h2>包含哪些内容</h2><div class="topic-cloud">${c.topics.map(t=>`<span class="topic-chip">${t}</span>`).join('')}</div></div><div class="related"><h2>已有问题 ${related.length?`· ${related.length}`:'· 正在补充'}</h2><div class="question-list">${related.length?related.map(questionRow).join(''):`<div class="empty"><div class="empty-icon">${ICONS.book}</div><h3>目录已经建好</h3><p>这个领域的具体答案仍在采集。保留入口，是为了让缺口不会被产品悄悄藏起来。</p></div>`}</div></div>`;
+      const fromDrawer=qs('#directoryDrawer').classList.contains('open');state.categoryReturn=fromDrawer?qs('#openDirectory'):document.activeElement;
+      if(fromDrawer){history.replaceState({},'',cleanUrl());closeDirectory(false,true)}
+      qs('#app').inert=true;
+      qs('#categoryView').classList.add('open');qs('#categoryView').scrollTop=0;bindDynamic();setTimeout(()=>qs('#categoryView').focus(),0);history.pushState({category:id},'',`#category=${id}`);
+    }
+    function closeCategory(push=false){qs('#categoryView').classList.remove('open');qs('#app').inert=false;const target=state.categoryReturn;setTimeout(()=>target?.focus?.(),0);state.categoryReturn=null;if(push)history.pushState({},'',location.pathname+location.search)}
+    function search(term){
+      term=term.trim().toLowerCase();const results=qs('#searchResults');
+      if(!term){results.classList.remove('active');qsa('.screen').forEach(el=>el.classList.toggle('active',el.dataset.screen==='home'));return;}
+      qsa('.screen').forEach(el=>el.classList.remove('active'));results.classList.add('active');
+      const matchedQ=campusQuestions().filter(q=>`${q.q}${q.a}${q.campus}`.toLowerCase().includes(term));
+      const matchedC=categories.filter(c=>`${c.name}${c.desc}${c.topics.join('')}`.toLowerCase().includes(term));
+      results.innerHTML=`<div class="search-summary">${state.campus==='全部校区'?'全部校区':state.campus} · 找到 ${matchedQ.length} 个问题、${matchedC.length} 个目录</div>${matchedQ.length?`<div class="question-list">${matchedQ.map(questionRow).join('')}</div>`:''}${matchedC.length?`<div class="section" style="padding:0;margin-top:22px"><div class="section-head"><h2>相关目录</h2></div><div class="directory-grid">${matchedC.map(dirCard).join('')}</div></div>`:''}${!matchedQ.length&&!matchedC.length?`<div class="empty"><div class="empty-icon">${ICONS.book}</div><h3>这个 Demo 暂无匹配答案</h3><p>当前页面不会提交你的搜索。正式版本会提供“请求补充”，现在可以试试“校区 + 事情”，例如“番禺 快递”。</p></div>`:''}`;bindDynamic();
+    }
+    function openCampus(){
+      qs('#campusList').innerHTML=campuses.map(c=>`<button class="campus-option ${state.campus===c?'selected':''}" data-campus="${c}"><strong>${c}</strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg></button>`).join('');
+      qsa('[data-campus]').forEach(el=>el.onclick=()=>{state.campus=el.dataset.campus;qs('#campusLabel').textContent=state.campus;localStorage.setItem('jilema-kb-campus',state.campus);qs('#campusDialog').close();renderBase();const term=qs('#searchInput').value;if(term)search(term);});qs('#campusDialog').showModal();
+    }
+
+    const aiMatches=[
+      {words:['报到','开学时间'],id:'undergrad-time'},{words:['材料','带什么'],id:'materials'},
+      {words:['缴费','学费','住宿费'],id:'payment'},{words:['jnuid','账号','统一身份'],id:'jnuid'},
+      {words:['热水','洗衣'],id:'hot-water'},{words:['宿舍','床'],id:'dorm'},{words:['校园网','网络','wifi'],id:'network'},
+      {words:['选课'],id:'course-time'},{words:['转专业'],id:'transfer'},{words:['绩点','gpa'],id:'gpa'},
+      {words:['四六级','六级','四级'],id:'cet'},{words:['医保','校医','门诊'],id:'medical'},
+      {words:['心理','咨询'],id:'psych'},{words:['社团'],id:'clubs'},{words:['实习','简历','职业'],id:'career'},
+      {words:['番禺','交通','怎么去'],id:'panyu-transport'}
+    ];
+    function matchAI(text){const lower=text.toLowerCase();const hit=aiMatches.find(x=>x.words.some(word=>lower.includes(word)));return hit?questions.find(q=>q.id===hit.id):null}
+    function escapeHtml(text){const el=document.createElement('span');el.textContent=text;return el.innerHTML}
+    function askAI(text){
+      text=text.trim();if(!text)return;const q=matchAI(text);const messages=qs('#aiMessages');
+      const user=document.createElement('div');user.className='ai-message user-message';user.innerHTML=`<span>${escapeHtml(text)}</span>`;messages.appendChild(user);
+      const answer=document.createElement('div');answer.className='ai-message assistant-message';
+      if(q){const s=statusInfo(q.status);answer.innerHTML=`<div class="assistant-label"><i>AI</i><span>基于校园知识库回答</span></div><div class="assistant-answer">${q.a}</div><div class="assistant-meta"><i class="status-dot ${s.class}"></i><strong>${s.label}</strong><span>·</span><span>${q.campus}</span><span>·</span><span>核验于 ${q.checked}</span></div><button class="answer-link" data-open-question="${q.id}"><span>查看完整步骤和原始来源</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>`}
+      else answer.innerHTML=`<div class="assistant-label"><i>AI</i><span>暂未命中知识条目</span></div><div class="assistant-answer">这个 Demo 目前还没有找到足够可靠的对应答案。你可以加上“校区 + 具体事情”再问一次，例如“番禺校区快递在哪里取”。正式版本也会在这里提供请求补充入口。</div><div class="assistant-meta"><i class="status-dot gap"></i><strong>不猜测答案</strong></div>`;
+      messages.appendChild(answer);bindDynamic();qs('#aiThread').scrollTop=qs('#aiThread').scrollHeight;
+    }
+
+    qs('#openDirectory').onclick=openDirectory;qsa('[data-open-directory]').forEach(el=>el.onclick=openDirectory);
+    qs('#closeDirectory').onclick=()=>history.back();qs('#directoryDrawer').onclick=e=>{if(e.target===qs('#directoryDrawer'))history.back()};
+    qs('#openAI').onclick=openAI;qs('#closeAI').onclick=()=>history.back();
+    qs('#campusButton').onclick=openCampus;
+    qs('#campusDialog').onclick=e=>{if(e.target===qs('#campusDialog'))qs('#campusDialog').close()};
+    qs('#searchInput').addEventListener('input',e=>search(e.target.value));
+    qs('#closeDetail').onclick=()=>history.back();qs('#closeCategory').onclick=()=>history.back();
+    qs('#saveQuestion').onclick=()=>{if(!state.currentQuestion)return;const id=state.currentQuestion.id;state.saved.has(id)?state.saved.delete(id):state.saved.add(id);localStorage.setItem('jilema-kb-saved',JSON.stringify([...state.saved]));const saved=state.saved.has(id);qs('#saveQuestion').setAttribute('aria-label',saved?'取消收藏':'收藏问题');qs('#saveQuestion').classList.toggle('saved',saved);};
+    qs('#aiInput').addEventListener('input',e=>{qs('#aiSend').disabled=!e.target.value.trim();e.target.style.height='auto';e.target.style.height=`${Math.min(e.target.scrollHeight,104)}px`});
+    qs('#aiInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();qs('#aiForm').requestSubmit()}});
+    qs('#aiForm').onsubmit=e=>{e.preventDefault();const input=qs('#aiInput');const text=input.value;input.value='';input.style.height='44px';qs('#aiSend').disabled=true;askAI(text)};
+    qsa('[data-ai-prompt]').forEach(el=>el.onclick=()=>askAI(el.dataset.aiPrompt));
+    window.addEventListener('popstate',()=>{if(qs('#detailView').classList.contains('open'))closeDetail();else if(qs('#categoryView').classList.contains('open'))closeCategory();else if(qs('#aiView').classList.contains('open'))closeAI();else if(qs('#directoryDrawer').classList.contains('open'))closeDirectory();});
+    window.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(qs('#detailView').classList.contains('open'))history.back();else if(qs('#categoryView').classList.contains('open'))history.back();else if(qs('#aiView').classList.contains('open'))history.back();else if(qs('#directoryDrawer').classList.contains('open'))history.back();});
+    state.campus=localStorage.getItem('jilema-kb-campus')||'全部校区';qs('#campusLabel').textContent=state.campus;
+    renderBase();
+  </script>
+</body>
+</html>
